@@ -1,0 +1,1 @@
+""" Lambtastic core module """
