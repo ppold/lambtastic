@@ -11,11 +11,11 @@ try:
 except ImportError:  # python2
     from urllib import urlretrieve
 
-from core.models import Landmark
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 import settings
+from core.models import Landmark, Kind
 
 
 engine = create_engine(settings.SQLALCHEMY_DB_URI)
@@ -44,12 +44,14 @@ def load_museos():
     logging.info('Downloading ...', dataset.url)
     download_data(dataset.url, dataset.filename)
     logging.info('loading ...', dataset.url)
+    museo = Kind(name='museo')
     with open(dataset.filename) as csvfile:
         for row in UnicodeDictReader(csvfile):
             landmark = Landmark(
                 name=row['NOMBRE_DEL_MUSEO'],
-                latitude=['LATITUD'],
-                longitude=['LONGITUD'],
+                latitude=row['LATITUD'],
+                longitude=row['LONGITUD'],
+                kind=museo,
             )
             session.add(landmark)
         session.commit()
@@ -59,18 +61,36 @@ def load_arqueologicos():
     """Load sitios arqueologicos"""
     dataset = Dataset('sitios.csv', 'http://lima.datosabiertos.pe/datastreams/79519-sitios-arqueologicos-de-lima.csv')
     logging.info('Downloading ...', dataset.url)
-    download_data(dataset.url)
-    logging.info('loading ...', dataset.url)
+    download_data(dataset.url, dataset.filename)
+    logging.info('loading ...', dataset.filename)
+    with open(dataset.filename) as csvfile:
+        for row in UnicodeDictReader(csvfile):
+            landmark = Landmark(
+                name=row['NOMBRE_DEL_MUSEO'],
+                latitude=row['LATITUD'],
+                longitude=row['LONGITUD'],
+            )
+            session.add(landmark)
+        session.commit()
 
 
 def load_historicos():
     dataset = Dataset('historicos.csv', 'http://lima.datosabiertos.pe/datastreams/79490-ambientes-urbano-monumentales-en-el-centro-historico-de-lima.csv'),
     logging.info('Downloading ...', dataset.url)
-    download_data(dataset.url)
-    logging.info('loading ...', dataset.url)
+    download_data(dataset.url, dataset.filename)
+    logging.info('loading ...', dataset.filename)
+    with open(dataset.filename) as csvfile:
+        for row in UnicodeDictReader(csvfile):
+            landmark = Landmark(
+                name=row['NOMBRE_DEL_MUSEO'],
+                latitude=row['LATITUD'],
+                longitude=row['LONGITUD'],
+            )
+            session.add(landmark)
+        session.commit()
 
 
 if __name__ == '__main__':
     load_museos()
-    load_arqueologicos()
-    load_historicos()
+    #load_arqueologicos()
+    #load_historicos()
