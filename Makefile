@@ -6,4 +6,4 @@ migrate:
 	PYTHONPATH=. alembic upgrade head
 
 clean:
-	-rm lambtastic.db
+	-rm -f lambtastic.db

@@ -1,51 +1,91 @@
-""" model definitions """
+# -*- coding: utf-8 -*-
 
-from sqlalchemy import Column, Integer, Date, Unicode, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, Unicode, String
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 
-BASE = declarative_base()
-
-class PKMixin:
-    """ primary key mixin for the rest of the models """
-    key = Column(Integer, primary_key=True)
+Base = declarative_base()
 
 
-class EnumMixin:
-    """ base model for enumerated values """
+class Landmark(Base):
+    __tablename__ = 'landmark'
 
-    name = Column(Unicode, nullable=False)
-    order = Column(Integer, autoincrement=True)
-
-
-class Kind(BASE, PKMixin, EnumMixin):
-    """ Kind of landmark, like a museum, historic site, etc """
-
-    __tablename__ = "kind"
+    id = Column(Integer, primary_key=True)
+    latitude = Column(String)
+    longitude = Column(String)
 
     def _asdict(self):
         return {
-            "id": self.key,
-            "name": self.name
+            'id': self.key,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
         }
 
 
-class Landmark(BASE, PKMixin, EnumMixin):
-    """ a point of interest """
+class Museum(Base):
+    __tablename__ = 'museum'
 
-    __tablename__ = "landmark"
-    kind_id = Column(Integer, ForeignKey('kind.key'))
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    cost = Column(Unicode)
+    webpage = Column(String)
+    schedule = Column(Unicode)
+    description = Column(Unicode)
 
-    latitude = Column(String)
-    longitude = Column(String)
-    kind = relationship(Kind, uselist=False)
+    landmark_id = Column(Integer, ForeignKey('landmark.id'))
+    landmark = relationship('Landmark', backref=backref('museo', uselist=False))
 
     def _asdict(self):
         return {
-            "id": self.key,
-            "name": self.name,
-            "latitude": self.latitude,
-            "longitude": self.longitude,
-            "kind": self.kind.name
+            'id': self.id,
+            'kind': 'museo',
+            'name': self.name,
+            'cost': self.costo,
+            'webpage': self.webpageo,
+            'schedule': self.scheduleo,
+            'latitude': self.location.latitude,
+            'longitude': self.location.longitude,
+            'description': self.description,
+        }
+
+
+class HistoricSite(Base):
+    __tablename__ = 'historic_site'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode)
+
+    landmark_id = Column(Integer, ForeignKey('landmark.id'))
+    landmark = relationship('Landmark', backref=backref('historic_site', uselist=False))
+
+    def _asdict(self):
+        return {
+            'id': self.id,
+            'kind': 'historic',
+            'name': self.name,
+            'latitude': self.location.latitude,
+            'longitude': self.location.longitude,
+        }
+
+
+class UrbanSite(Base):
+    __tablename__ = 'urban_site'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode)
+    direction = Column(Unicode)
+    description = Column(Unicode)
+
+    landmark_id = Column(Integer, ForeignKey('landmark.id'))
+    landmark = relationship('Landmark', backref=backref('urban_site', uselist=False))
+
+    def _asdict(self):
+        return {
+            'id': self.id,
+            'kind': 'urban',
+            'name': self.name,
+            'direction': self.direction,
+            'latitude': self.location.latitude,
+            'longitude': self.location.longitude,
         }

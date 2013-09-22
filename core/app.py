@@ -68,4 +68,4 @@ def bikeways(session):
 
     kind = session.query(Kind).filter_by(name="bikeways").first()
     data = session.query(Landmark).filter_by(kind=kind).all()
-    return data
+    return json.dumps(data)
