@@ -16,6 +16,12 @@
 <body class='{% block body_class %}{% endblock %}'>
 	{% block content %}{% endblock %}
 	{% raw %}
+	<script id="twitter_template" type="text/x-handlebars-template">
+		<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://localhost:8081/#{{ id }}" data-text="{{ name }}" data-lang="es" data-hashtags="lambtastic">Twittear</a>
+	</script>
+	<script id="facebook_template" type="text/x-handlebars-template">
+		<div class="fb-like" data-href="http://localhost:8081/#{{ id }}" data-width="300" data-layout="button_count" data-action="recommend" data-show-faces="true" data-send="false"></div>
+	</script>
 	<script id="results_template" type="text/x-handlebars-template">
 	{{#each landmarks}}
 	<li id={{ id }}>
@@ -34,12 +40,23 @@
 				{{/ifCond}}
 				<p class="distance">Distancia: <span class="distance-value"></span></p>
 				<p class="time">Tiempo en llegar: <span class="time-value"></span></p>
+				<p class="twitter"></p>
+				<div class="facebook"></div>
 			</div>
 		</a>
 	</li>
 	{{/each}}
 	</script>
 	{% endraw %}
+	<div id="fb-root"></div>
+	<script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/es_LA/all.js#xfbml=1";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));</script>
+	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
 	<script src="/static/scripts/handlebars.js"></script>
 	<script src="http://requirejs.org/docs/release/2.1.8/minified/require.js" data-main="/static/scripts/app"></script>

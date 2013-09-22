@@ -68,11 +68,13 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 			console.log(landmarks);
 
 			landmarks.forEach(add_landmark);
+			twitter_template = Handlebars.compile(document.querySelector('#twitter_template').innerHTML);
+			facebook_template = Handlebars.compile(document.querySelector('#facebook_template').innerHTML);
 			template = Handlebars.compile(document.querySelector('#results_template').innerHTML);
 			results = document.querySelector('#results');
 			results.innerHTML = template({landmarks:landmarks});
 
-			function show_route (from, to, el) {
+			function show_route (from, to, el, data) {
 				var request = {
 					origin:from.position,
 					destination:to.position,
@@ -88,6 +90,11 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 						el.querySelector('.time-value').textContent = info.duration.text;
 					}
 				});
+
+				el.querySelector('.twitter').innerHTML = twitter_template(data);
+				el.querySelector('.facebook').innerHTML = facebook_template(data);
+				twttr.widgets.load(el);
+				FB.XFBML.parse(el);
 			}
 
 
@@ -104,9 +111,13 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 				console.log(location.hash.slice(1));
 				var target = document.getElementById(location.hash.slice(1));
 				var index = Array.prototype.indexOf.call(wholeListing.children, target);
-				show_route(from, markers[index], target);
+				show_route(from, markers[index], target, landmarks[index]);
 			});
 
+			var initialHash = window.location.hash;
+
+			window.location.hash = '';
+			window.location.hash = initialHash;
 		});
 	}
 
