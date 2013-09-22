@@ -17,7 +17,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 import settings
-from core.models import Landmark, Kind
+from core.models import Landmark, Museum, HistoricSite, UrbanSite
 
 
 engine = create_engine(settings.SQLALCHEMY_DB_URI)
@@ -112,17 +112,18 @@ def download_data(url, filename=None):
 def load_museos():
     dataset = Dataset('museos.csv', 'http://lima.datosabiertos.pe/datastreams/79487-museos-de-lima.csv')
     download_data(dataset.url, dataset.filename)
-    kind = Kind(name=u'museo')
     logging.info('Loading ... %s', dataset.url)
     with open(dataset.filename) as csvfile:
         for row in UnicodeDictReader(csvfile):
-            landmark = Landmark(
-                name=row['NOMBRE_DEL_MUSEO'],
-                latitude=row['LATITUD'],
-                longitude=row['LONGITUD'],
-                kind=kind,
-            )
-            session.add(landmark)
+            landmark = Landmark(latitude=row['LATITUD'],
+                                longitude=row['LONGITUD'])
+            museo = Museum(name=row['NOMBRE_DEL_MUSEO'],
+                           cost=row['COSTO'],
+                           phone=row['TELEFONO'],
+                           webpage=row['PAGINA_WEB'],
+                           schedule=row['HORARIO_ATENCION'],
+                           landmark=landmark)
+            session.add(museo)
         session.commit()
 
 
@@ -131,7 +132,6 @@ def load_sitios():
     dataset = Dataset('sitios.csv', 'http://lima.datosabiertos.pe/datastreams/79519-sitios-arqueologicos-de-lima.csv')
     download_data(dataset.url, dataset.filename)
     logging.info('loading ... %s', dataset.filename)
-    kind = Kind(name=u'sitio')
     with open(dataset.filename) as csvfile:
         for row in unicode_csv_reader(csvfile):
             name = row[0]
@@ -140,7 +140,6 @@ def load_sitios():
             centroid = poligon.centroid
             landmark = Landmark(
                 name=name,
-                kind=kind,
                 latitude=centroid[0],
                 longitude=centroid[1],
             )
@@ -151,7 +150,6 @@ def load_sitios():
 def load_urbanos():
     dataset = Dataset('historicos.csv', 'http://lima.datosabiertos.pe/datastreams/79490-ambientes-urbano-monumentales-en-el-centro-historico-de-lima.csv')
     download_data(dataset.url, dataset.filename)
-    kind = Kind(name=u'Centro Historico')
     logging.info('Loading ...  %s', dataset.filename)
     with open(dataset.filename) as csvfile:
         for row in UnicodeDictReader(csvfile):
@@ -160,16 +158,14 @@ def load_urbanos():
             geo = get_geolocation_data(location)
             logging.debug('Received geolocation: %s', geo)
             if not geo['results']:
-                logging.info('Geocoding not found for: "%s"', name)
+                logging.warn('Geocoding not found for: "%s"', name)
                 landmark = Landmark(
-                    kind=kind,
                     name=name,
                     latitude=None,
                     longitude=None,
                 )
             else:
                 landmark = Landmark(
-                    kind=kind,
                     name=name,
                     latitude=geo['results'][0]['geometry']['location']['lat'],
                     longitude=geo['results'][0]['geometry']['location']['lng'],
@@ -208,4 +204,4 @@ if __name__ == '__main__':
 
     if args.test:
         import doctest
-        doctest.testmod()
+        doctest.testmod(verbose=True)
