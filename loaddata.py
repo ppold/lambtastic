@@ -198,7 +198,7 @@ def load_urbanos():
             urban_site = UrbanSite(
                 name=name,
                 landmark=landmark,
-                direction=row['Dirección'],
+                direction=u'{0} {1}'.format(row['Dirección'], row['']),
                 description=row['Descripción'],
                 arch_type=row['Tipo de arquitectura']
             )
