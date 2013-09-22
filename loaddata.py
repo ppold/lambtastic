@@ -200,6 +200,7 @@ def load_urbanos():
                 landmark=landmark,
                 direction=row['Dirección'],
                 description=row['Descripción'],
+                arch_type=row['Tipo de arquitectura']
             )
             session.add(urban_site)
         session.commit()
