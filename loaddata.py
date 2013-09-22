@@ -68,11 +68,12 @@ def load_museos():
         session.commit()
 
 
-def load_arqueologicos():
+def load_sitios():
     """Load sitios arqueologicos"""
     dataset = Dataset('sitios.csv', 'http://lima.datosabiertos.pe/datastreams/79519-sitios-arqueologicos-de-lima.csv')
     download_data(dataset.url, dataset.filename)
     logging.info('loading ... %s', dataset.filename)
+    return
     with open(dataset.filename) as csvfile:
         for row in UnicodeDictReader(csvfile):
             landmark = Landmark(
@@ -84,7 +85,7 @@ def load_arqueologicos():
         session.commit()
 
 
-def load_historicos():
+def load_urbanos():
     dataset = Dataset('historicos.csv', 'http://lima.datosabiertos.pe/datastreams/79490-ambientes-urbano-monumentales-en-el-centro-historico-de-lima.csv')
     download_data(dataset.url, dataset.filename)
     historico = Kind(name=u'Centro Historico')
@@ -115,12 +116,26 @@ def load_historicos():
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser(description='Panavision sync')
-    parser.add_argument('-l', '--loglevel', dest='loglevel', default='info',
-                        type=str, help='Logging level')
+    parser.add_argument('-l', '--loglevel', dest='loglevel', default='info', type=str, help='Logging level')
+    parser.add_argument('-a', '--all', dest='all', action='store_true', help='Load all')
+    parser.add_argument('-m', '--museos', dest='museos', action='store_true', help='Load only museos')
+    parser.add_argument('-s', '--sitios', dest='sitios', action='store_true', help='Load only sitios arqueologicos')
+    parser.add_argument('-u', '--urbanos', dest='urbanos', action='store_true', help='Load only sitios urbanos')
     args = parser.parse_args()
     level = getattr(logging, args.loglevel.upper(), logging.INFO)
     logging.basicConfig(level=level)
 
-    load_museos()
-    #load_arqueologicos()
-    load_historicos()
+    # Clean me maybe
+    if args.all:
+        load_museos()
+        load_sitios()
+        load_urbanos()
+
+    if args.museos:
+        load_museos()
+
+    if args.sitios:
+        load_sitios()
+
+    if args.urbanos:
+        load_urbanos()
