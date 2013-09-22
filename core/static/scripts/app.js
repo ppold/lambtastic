@@ -6,6 +6,9 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 	  return options.inverse(this);
 	});
 
+	var landmarks = null;
+	var wholeListing = null;
+
 	var initialize = function initialize(latitude, longitude) {
 		var mapOptions = {
 			center: new google.maps.LatLng(latitude, longitude),
@@ -47,6 +50,10 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 			});
 
 			markers.push(marker);
+			google.maps.event.addListener(marker, 'click', function() {
+				var htmlItem = wholeListing.children[markers.indexOf(marker)];
+				window.location.hash = htmlItem.id;
+		  });
 		}
 
 		Promise.all(["historic", "museums", "sites"].map(function (resource) {
@@ -84,14 +91,22 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 			}
 
 
-			var wholeListing = document.querySelector("#results");
+			wholeListing = document.querySelector("#results");
 
-			Array.prototype.forEach.call(wholeListing.querySelectorAll("li"), function (elem) {
-				elem.addEventListener('click', function (event) {
-					var index = Array.prototype.indexOf.call(wholeListing.children, event.currentTarget);
-					show_route(from, markers[index], event.currentTarget);
-				});
+			// Array.prototype.forEach.call(wholeListing.querySelectorAll("li"), function (elem) {
+			// 	elem.addEventListener('click', function (event) {
+			// 		var index = Array.prototype.indexOf.call(wholeListing.children, event.currentTarget);
+			// 		show_route(from, markers[index], event.currentTarget);
+			// 	});
+			// });
+
+			window.addEventListener('hashchange', function (event) {
+				console.log(location.hash.slice(1));
+				var target = document.getElementById(location.hash.slice(1));
+				var index = Array.prototype.indexOf.call(wholeListing.children, target);
+				show_route(from, markers[index], target);
 			});
+
 		});
 	}
 
