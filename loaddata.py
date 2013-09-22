@@ -115,9 +115,14 @@ def load_museos():
     logging.info('Loading ... %s', dataset.url)
     with open(dataset.filename) as csvfile:
         for row in UnicodeDictReader(csvfile):
+            name = row['NOMBRE_DEL_MUSEO']
+            museo = session.query(Museum).filter_by(name=name).first()
+            if museo:
+                logging.info('Found museum with name: "%s"... Skipping', name)
+                continue
             landmark = Landmark(latitude=row['LATITUD'],
                                 longitude=row['LONGITUD'])
-            museo = Museum(name=row['NOMBRE_DEL_MUSEO'],
+            museo = Museum(name=name,
                            cost=row['COSTO'],
                            phone=row['TELEFONO'],
                            webpage=row['PAGINA_WEB'],
@@ -135,15 +140,16 @@ def load_sitios():
     with open(dataset.filename) as csvfile:
         for row in unicode_csv_reader(csvfile):
             name = row[0]
+            hist_site = session.query(HistoricSite).filter_by(name=name).first()
+            if hist_site:
+                logging.info('Found historic site with name: "%s"... Skiping', name)
+                continue
             points = [convfloat(i) for i in row[2].split('0.0') if i.strip()]  # muahahaha
             poligon = Poligon(points)
             centroid = poligon.centroid
-            landmark = Landmark(
-                # name=name,
-                latitude=centroid[0],
-                longitude=centroid[1],
-            )
-            session.add(landmark)
+            landmark = Landmark(latitude=centroid[0], longitude=centroid[1])
+            hist_site = HistoricSite(name=name, landmark=landmark)
+            session.add(hist_site)
         session.commit()
 
 
@@ -154,6 +160,10 @@ def load_urbanos():
     with open(dataset.filename) as csvfile:
         for row in UnicodeDictReader(csvfile):
             name=row['Nombre de la U.I.']
+            urban_site = session.query(UrbanSite).filter_by(name=name).first()
+            if urban_site:
+                logging.info('Found historic site with name: "%s"... Skiping', name)
+                continue
             location = u'{0}, Lima, Peru'.format(name)
             geo = get_geolocation_data(location)
             logging.debug('Received geolocation: %s', geo)
@@ -170,7 +180,13 @@ def load_urbanos():
                     latitude=geo['results'][0]['geometry']['location']['lat'],
                     longitude=geo['results'][0]['geometry']['location']['lng'],
                 )
-            session.add(landmark)
+            urban_site = UrbanSite(
+                name=name,
+                landmark=landmark,
+                direction=row['Dirección'],
+                description=row['Descripción'],
+            )
+            session.add(urban_site)
         session.commit()
 
 
