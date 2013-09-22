@@ -11,18 +11,19 @@
 
     var add_script_tag, calls, generate_closure, get, jsonp, options, post, xhr;
 
-    xhr = function(url, data, headers, method) {
+    xhr = function(url, method, data, responseType, headers) {
       var handler, header, promise, request, value;
 
       handler = function(event) {
         if (request.readyState === 4) {
           request.removeEventListener(event.type, handler);
-          return promise.resolve(request.status, request.response);
+          return promise.resolve(request.response);
         }
       };
       promise = new Promise();
       request = new XMLHttpRequest();
       request.open(method, url);
+      request.responseType = responseType;
       for (header in headers) {
         value = headers[header];
         request.setRequestHeader(header, value);
@@ -31,14 +32,17 @@
       request.send(data);
       return promise;
     };
+    json = function(url) {
+      return xhr(url, 'GET', null, 'json')
+    };
     get = function(url, data, headers) {
-      return xhr(url, data, headers, 'GET');
+      return xhr(url, 'GET', data, null, headers);
     };
     options = function(url, data, headers) {
-      return xhr(url, data, headers, 'OPTIONS');
+      return xhr(url, 'OPTIONS', data, null, headers);
     };
     post = function(url, data, headers) {
-      return xhr(url, data, headers, 'POST');
+      return xhr(url, 'POST', data, null, headers);
     };
     calls = 0;
     jsonp = function(url) {
@@ -70,6 +74,7 @@
       };
     };
     return {
+      json: json,
       get: get,
       options: options,
       post: post,

@@ -56,9 +56,10 @@ def landmark(session):
 def museums(session):
     """ returns a list of museums """
 
+    response.content_type = "application/json"
     museums_kind = session.query(Kind).filter_by(name="museo").first()
     data = session.query(Landmark).filter_by(kind=museums_kind).all()
-    return data
+    return json.dumps(data)
 
 
 @get("/landmarks/bikeways")
