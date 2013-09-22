@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
+import re
 import csv
 import json
 import logging
@@ -48,6 +49,19 @@ def convfloat(string):
     """
     values = string.split(',')
     return [float(value) for value in values if value]
+
+
+def clean_sitename(name):
+    """
+    >>> clean_sitename(u'10 Mateo Salado')
+    u'Mateo Salado'
+    >>> clean_sitename(u'Caleta Gaviota')
+    u'Caleta Gaviota'
+    >>> clean_sitename(u'265 Monticulo 16')
+    u'Monticulo 16'
+    """
+    useless_number = re.compile('^\d+\s', flags=re.UNICODE)
+    return re.sub(useless_number, '', name)
 
 
 class reify(object):
@@ -139,7 +153,7 @@ def load_sitios():
     logging.info('loading ... %s', dataset.filename)
     with open(dataset.filename) as csvfile:
         for row in unicode_csv_reader(csvfile):
-            name = row[0]
+            name = clean_sitename(row[0])
             hist_site = session.query(HistoricSite).filter_by(name=name).first()
             if hist_site:
                 logging.info('Found historic site with name: "%s"... Skiping', name)
@@ -160,6 +174,9 @@ def load_urbanos():
     with open(dataset.filename) as csvfile:
         for row in UnicodeDictReader(csvfile):
             name=row['Nombre de la U.I.']
+            if not name.split():
+                logging.warn('Skiping empty row "%s": %s', row['Ubicación'], row['Item'])
+                continue
             urban_site = session.query(UrbanSite).filter_by(name=name).first()
             if urban_site:
                 logging.info('Found historic site with name: "%s"... Skiping', name)
@@ -170,21 +187,20 @@ def load_urbanos():
             if not geo['results']:
                 logging.warn('Geocoding not found for: "%s"', name)
                 landmark = Landmark(
-                    # name=name,
                     latitude=None,
                     longitude=None,
                 )
             else:
                 landmark = Landmark(
-                    # name=name,
                     latitude=geo['results'][0]['geometry']['location']['lat'],
                     longitude=geo['results'][0]['geometry']['location']['lng'],
                 )
             urban_site = UrbanSite(
                 name=name,
                 landmark=landmark,
-                direction=row['Dirección'],
+                direction=u'{0} {1}'.format(row['Dirección'], row['']),
                 description=row['Descripción'],
+                arch_type=row['Tipo de arquitectura']
             )
             session.add(urban_site)
         session.commit()

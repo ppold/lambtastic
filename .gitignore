@@ -34,4 +34,5 @@ nosetests.xml
 .project
 .pydevproject
 *.csv
+*.db-journal
 lambtastic.db

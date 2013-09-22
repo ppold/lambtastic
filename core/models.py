@@ -87,6 +87,7 @@ class UrbanSite(Base):
     name = Column(Unicode)
     direction = Column(Unicode)
     description = Column(Unicode)
+    arch_type = Column(Unicode)
 
     landmark_id = Column(Integer, ForeignKey('landmark.id'))
     landmark = relationship('Landmark', backref=backref('urban_site', uselist=False))
