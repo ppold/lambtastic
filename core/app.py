@@ -70,10 +70,11 @@ def museums(session):
     data = session.query(Landmark).filter_by(kind=historic_kind).all()
     return json.dumps(data)
 
-@get("/landmarks/bikeways")
-def bikeways(session):
-    """ returns a list of bikeways """
+@get("/landmarks/sites")
+def sites(session):
+    """ returns a list of sites """
 
-    kind = session.query(Kind).filter_by(name="bikeways").first()
+    response.content_type = "application/json"
+    kind = session.query(Kind).filter_by(name="sitio").first()
     data = session.query(Landmark).filter_by(kind=kind).all()
-    return data
+    return json.dumps(data)

@@ -1,4 +1,4 @@
-require(['./xhr'], function(xhr) {
+require(['./xhr', './promise'], function(xhr, Promise) {
 	var initialize = function initialize(latitude, longitude) {
 		var mapOptions = {
 			center: new google.maps.LatLng(latitude, longitude),
@@ -14,23 +14,21 @@ require(['./xhr'], function(xhr) {
 					title: landmark.name,
 					map: map
 			});
-			console.log(landmark);
 		}
 
-		xhr.get("/landmarks/museums").then(function result (data) {
-			jsonResult = JSON.parse(data);
-			jsonResult.forEach(add_landmark);
-			template = Handlebars.compile(document.querySelector('#results_template').innerHTML);
-			results = document.querySelector('#results');
-			results.innerHTML = template({landmarks:jsonResult});
-		});
+		Promise.all(["historic", "museums", "sites"].map(function (resource) {
+			return xhr.get("/landmarks/"+resource);
+		})).then(function (resultList) {
+			landmarks = [];
 
-		xhr.get("/landmarks/historic").then(function result (data) {
-			jsonResult = JSON.parse(data);
-			jsonResult.forEach(add_landmark);
+			resultList.forEach(function (data) {
+				landmarks = landmarks.concat(JSON.parse(data[0]));
+			});
+
+			landmarks.forEach(add_landmark);
 			template = Handlebars.compile(document.querySelector('#results_template').innerHTML);
 			results = document.querySelector('#results');
-			results.innerHTML = template({landmarks:jsonResult});
+			results.innerHTML = template({landmarks:landmarks});
 		});
 	}
 
