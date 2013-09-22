@@ -14,12 +14,12 @@ class Landmark(Base):
     __tablename__ = 'landmark'
 
     id = Column(Integer, primary_key=True)
-    guid = Column(String, nullable=False)
+    guid = Column(String)
     latitude = Column(String)
     longitude = Column(String)
 
     def __init__(self, **kwargs):
-        guid = uuid.uuid4()
+        guid = str(uuid.uuid4())
         kwargs.setdefault('guid', guid)
         super(Landmark, self).__init__(**kwargs)
 
@@ -38,6 +38,7 @@ class Museum(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     cost = Column(Unicode)
+    phone = Column(String)
     webpage = Column(String)
     schedule = Column(Unicode)
     description = Column(Unicode)
@@ -51,8 +52,9 @@ class Museum(Base):
             'kind': 'museo',
             'name': self.name,
             'cost': self.costo,
-            'webpage': self.webpageo,
-            'schedule': self.scheduleo,
+            'phone': self.phone,
+            'schedule': self.schedule,
+            'description': self.description,
             'latitude': self.location.latitude,
             'longitude': self.location.longitude,
             'description': self.description,
