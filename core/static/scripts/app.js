@@ -20,5 +20,3 @@ var get_location = function get_location() {
 }
 
 get_location();
-
-

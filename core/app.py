@@ -30,15 +30,18 @@ STATIC_PATH = abspath(join(directory, 'static'))
 
 template = functools.partial(template, template_lookup=[TEMPLATE_PATH])
 
+
 @get('/')
 def index():
     """ landing page """
     return template('index.html')
 
+
 @get('/static/<filepath:path>')
 def send_static(filepath):
     """ serves the front-end resources """
     return static_file(filepath, root=STATIC_PATH)
+
 
 @get("/landmarks/<key:int>")
 def landmark(session):
@@ -48,20 +51,20 @@ def landmark(session):
     data = session.query(Landmark).get(key)
     return json.dumps(data)
 
+
 @get("/landmarks/museums")
 def museums(session):
     """ returns a list of museums """
 
-    response.content_type = "application/json"
-    museums_kind = session.query(Kind).filter(name="museum").one()
-    data = session.query(Landmark).filter(kind=museums_kind).all()
-    return json.dumps(data)
+    museums_kind = session.query(Kind).filter_by(name="museo").first()
+    data = session.query(Landmark).filter_by(kind=museums_kind).all()
+    return data
+
 
 @get("/landmarks/bikeways")
 def bikeways(session):
     """ returns a list of bikeways """
 
-    response.content_type = "application/json"
-    bikeways_kind = session.query(Kind).filter(name="bikeways").one()
-    data = session.query(Landmark).filter(kind=bikeways_kind).all()
-    return json.dumps(data)
+    kind = session.query(Kind).filter_by(name="bikeways").first()
+    data = session.query(Landmark).filter_by(kind=kind).all()
+    return data

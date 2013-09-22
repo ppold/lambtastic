@@ -24,6 +24,12 @@ class Kind(BASE, PKMixin, EnumMixin):
 
     __tablename__ = "kind"
 
+    def _asdict(self):
+        return {
+            "id": self.key,
+            "name": self.name
+        }
+
 
 class Landmark(BASE, PKMixin, EnumMixin):
     """ a point of interest """
@@ -34,3 +40,12 @@ class Landmark(BASE, PKMixin, EnumMixin):
     latitude = Column(String)
     longitude = Column(String)
     kind = relationship(Kind, uselist=False)
+
+    def _asdict(self):
+        return {
+            "id": self.key,
+            "name": self.name,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "kind": self.kind.name
+        }
