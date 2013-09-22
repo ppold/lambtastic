@@ -3,6 +3,14 @@ html, body {
 	font-family: 'Helvetica Neue', sans-serif;
 }
 
+.searcher {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	width: 100%;
+	font-size: 24px;
+}
+
 .cf:before,
 .cf:after {
     content: " "; /* 1 */

@@ -6,6 +6,19 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 	  return options.inverse(this);
 	});
 
+	var searcher = document.querySelector('.searcher');
+	searcher.addEventListener('input', function filter (event) {
+		for (var i = landmarks.length - 1; i >= 0; i--) {
+			var item = wholeListing.children[i];
+			var name = item.querySelector('h1').textContent.toLowerCase();
+			if (name.indexOf(searcher.value.toLowerCase()) != -1) {
+				item.style.display = 'block';
+			} else {
+				item.style.display = 'none';
+			}
+		};
+	});
+
 	var landmarks = null;
 	var wholeListing = null;
 
