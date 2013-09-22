@@ -94,7 +94,7 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 				el.querySelector('.twitter').innerHTML = twitter_template(data);
 				el.querySelector('.facebook').innerHTML = facebook_template(data);
 				twttr.widgets.load(el);
-				FB.XFBML.parse(el);
+				FB.XFBML.parse();
 			}
 
 
