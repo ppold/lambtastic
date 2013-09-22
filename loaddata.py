@@ -41,9 +41,9 @@ def download_data(url, filename=None):
 
 def load_museos():
     dataset = Dataset('museos.csv', 'http://lima.datosabiertos.pe/datastreams/79487-museos-de-lima.csv')
-
     logging.info('Downloading ...', dataset.url)
-    print(dataset.url)
+    download_data(dataset.url)
+    logging.info('loading ...', dataset.url)
     with open(dataset.filename) as csvfile:
         for row in UnicodeDictReader(csvfile):
             landmark = Landmark(
@@ -56,13 +56,21 @@ def load_museos():
 
 
 def load_arqueologicos():
-    """Load sition arqueologicos"""
-    dataset = Dataset('sitios.csv', 'http://lima.datosabiertos.pe/datastreams/79519-sitios-arqueologicos-de-lima.csv'),
+    """Load sitios arqueologicos"""
+    dataset = Dataset('sitios.csv', 'http://lima.datosabiertos.pe/datastreams/79519-sitios-arqueologicos-de-lima.csv')
+    logging.info('Downloading ...', dataset.url)
+    download_data(dataset.url)
+    logging.info('loading ...', dataset.url)
 
 
 def load_historicos():
     dataset = Dataset('historicos.csv', 'http://lima.datosabiertos.pe/datastreams/79490-ambientes-urbano-monumentales-en-el-centro-historico-de-lima.csv'),
+    logging.info('Downloading ...', dataset.url)
+    download_data(dataset.url)
+    logging.info('loading ...', dataset.url)
 
 
 if __name__ == '__main__':
     load_museos()
+    load_arqueologicos()
+    load_historicos()
