@@ -94,3 +94,30 @@ if __name__ == '__main__':
     load_museos()
     #load_arqueologicos()
     #load_historicos()
+
+# def get_geolocation_data(address):
+#     """ gets gps information about a given address """
+
+#     google_geocode_api = 'http://maps.googleapis.com/maps/api/geocode/json'
+#     payload = {'address': address, 'sensor': 'false', 'region': 'pe'}
+#     request = requests.get(google_geocode_api, params=payload)
+
+#     json_data = json.loads(request.text)
+#     status = json_data['status']
+
+#     if status == 'ZERO_RESULTS':
+#         print 'No results.'
+#     elif status == 'OVER_QUERY_LIMIT':
+#         print 'Limit reached, try again later.'
+#     else:
+#         geometry = json_data['results'][0]['geometry']
+#         location = geometry['location']
+#         bounds = geometry['viewport']
+#         northeast = bounds['northeast']
+#         southwest = bounds['southwest']
+
+#         return dict(
+#             latitude=location['lat'], longitude=location['lng'],
+#             north=northeast['lat'], east=northeast['lng'],
+#             south=southwest['lat'], west=southwest['lng']
+#         )
