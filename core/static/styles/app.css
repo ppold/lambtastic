@@ -17,15 +17,34 @@ html, body {
 	height: 100%;
 }
 
+.landmarks li:target {
+	background: #333;
+}
+
+.landmarks li .details {
+	display: none;
+}
+
+.landmarks li:target .details {
+	display: block;
+}
+
 .container {
 	height: 100%;
+}
+
+a:-webkit-any-link {
+color: white;
+cursor: auto;
+text-decoration: none;
 }
 
 .map {
 	/*position: absolute;*/
 	/*width: calc(100% - 288px);*/
-	width: 100%;
+	width: 70%;
 	height: 100%;
+	float: right;
 	/*float: right;*/
 	/*right: 0;*/
 }
@@ -34,21 +53,22 @@ html, body {
 	font-family: 'Helvetica Neue', sans-serif;
 	background: black;
 	color: white;
-	padding: 10px 20px;
-	width: 288px;
-	/*position: absolute;*/
-	float: left;
-	top: 0;
-	bottom: 0;
+	/*width: 288px;*/
+	width: 350px;
 	height: 100%;
 	overflow: scroll;
-	display: inline-block;
+	float: left;
 }
 
 .landmarks-list {
 	list-style: none;
 	margin: 0;
 	padding: 0;
+}
+
+.landmarks a {
+	padding: 10px 20px;
+	display: block;
 }
 
 .landmarks h1, h2 {
@@ -58,7 +78,7 @@ html, body {
 }
 
 .landmarks li {
-	padding: 10px 0;
+	position: relative;
 }
 
 .landmarks h1 {

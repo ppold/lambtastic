@@ -18,9 +18,14 @@
 	{% raw %}
 	<script id="results_template" type="text/x-handlebars-template">
 	{{#each landmarks}}
-	<li>
-		<h1>{{ name }}</h1>
-		<h2>Av Cuba 127 Jesus Maria, Lima, Lima</h2>
+	<li id={{ id }}>
+		<a href="#{{ id }}">
+			<h1>{{ name }}</h1>
+			<h2>Av Cuba 127 Jesus Maria, Lima, Lima</h2>
+			<div class="details">
+				<p>more details</p>
+			</div>
+		</a>
 	</li>
 	{{/each}}
 	</script>

@@ -12,7 +12,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import desc
 import bottle_sqlalchemy
-from .models import Landmark, Kind
+from .models import Landmark, Museum, HistoricSite, UrbanSite
 import settings
 
 # app setup
@@ -57,8 +57,9 @@ def museums(session):
     """ returns a list of museums """
 
     response.content_type = "application/json"
-    museums_kind = session.query(Kind).filter_by(name="museo").first()
-    data = session.query(Landmark).filter_by(kind=museums_kind).all()
+    # museums_kind = session.query(Kind).filter_by(name="museo").first()
+    # filter_by(kind=museums_kind)
+    data = session.query(Museum).all()
     return json.dumps(data)
 
 @get("/landmarks/historic")
@@ -66,15 +67,19 @@ def museums(session):
     """ returns a list of museums """
 
     response.content_type = "application/json"
-    historic_kind = session.query(Kind).filter_by(name="Centro Historico").first()
-    data = session.query(Landmark).filter_by(kind=historic_kind).all()
+    data = session.query(HistoricSite).all()
     return json.dumps(data)
+    # historic_kind = session.query(Kind).filter_by(name="Centro Historico").first()
+    # data = session.query(Landmark).filter_by(kind=historic_kind).all()
+    # return json.dumps(data)
 
 @get("/landmarks/sites")
 def sites(session):
     """ returns a list of sites """
 
     response.content_type = "application/json"
-    kind = session.query(Kind).filter_by(name="sitio").first()
-    data = session.query(Landmark).filter_by(kind=kind).all()
+    data = session.query(UrbanSite).all()
     return json.dumps(data)
+    # kind = session.query(Kind).filter_by(name="sitio").first()
+    # data = session.query(Landmark).filter_by(kind=kind).all()
+    # return json.dumps(data)

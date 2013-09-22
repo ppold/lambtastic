@@ -5,7 +5,20 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 			zoom: 14,
 			mapTypeId: google.maps.MapTypeId.ROADMAP
 		};
+		var directionsDisplay = new google.maps.DirectionsRenderer();
 		var map = new google.maps.Map(document.querySelector(".map-canvas"), mapOptions);
+		var directionsService = new google.maps.DirectionsService();
+		directionsDisplay.setMap(map);
+
+		var myLatlng = new google.maps.LatLng(latitude, longitude);
+		var from = new google.maps.Marker({
+				position: myLatlng,
+				title: 'aqui estamos',
+				map: map,
+				icon: '/static/img/current.png'
+		});
+
+		var markers = [];
 
 		function add_landmark (landmark) {
 			var myLatlng = new google.maps.LatLng(landmark.latitude, landmark.longitude);
@@ -14,6 +27,8 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 					title: landmark.name,
 					map: map
 			});
+
+			markers.push(marker);
 		}
 
 		Promise.all(["historic", "museums", "sites"].map(function (resource) {
@@ -29,6 +44,30 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 			template = Handlebars.compile(document.querySelector('#results_template').innerHTML);
 			results = document.querySelector('#results');
 			results.innerHTML = template({landmarks:landmarks});
+
+			function show_route (from, to) {
+				var request = {
+					origin:from.position,
+					destination:to.position,
+					travelMode: google.maps.TravelMode.DRIVING
+				};
+				directionsService.route(request, function(result, status) {
+					if (status == google.maps.DirectionsStatus.OK) {
+						console.log(result);
+						directionsDisplay.setDirections(result);
+					}
+				});
+			}
+
+
+			var wholeListing = document.querySelector("#results");
+
+			Array.prototype.forEach.call(document.querySelectorAll("li", wholeListing), function (elem) {
+				elem.addEventListener('click', function (event) {
+					var index = Array.prototype.indexOf.call(wholeListing.children, event.currentTarget);
+					show_route(from, markers[index]);
+				});
+			});
 		});
 	}
 

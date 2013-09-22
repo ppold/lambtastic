@@ -139,7 +139,7 @@ def load_sitios():
             poligon = Poligon(points)
             centroid = poligon.centroid
             landmark = Landmark(
-                name=name,
+                # name=name,
                 latitude=centroid[0],
                 longitude=centroid[1],
             )
@@ -160,13 +160,13 @@ def load_urbanos():
             if not geo['results']:
                 logging.warn('Geocoding not found for: "%s"', name)
                 landmark = Landmark(
-                    name=name,
+                    # name=name,
                     latitude=None,
                     longitude=None,
                 )
             else:
                 landmark = Landmark(
-                    name=name,
+                    # name=name,
                     latitude=geo['results'][0]['geometry']['location']['lat'],
                     longitude=geo['results'][0]['geometry']['location']['lng'],
                 )

@@ -51,12 +51,12 @@ class Museum(Base):
             'id': self.id,
             'kind': 'museo',
             'name': self.name,
-            'cost': self.costo,
+            'cost': self.cost,
             'phone': self.phone,
             'schedule': self.schedule,
             'description': self.description,
-            'latitude': self.location.latitude,
-            'longitude': self.location.longitude,
+            'latitude': self.landmark.latitude,
+            'longitude': self.landmark.longitude,
             'description': self.description,
         }
 
@@ -75,8 +75,8 @@ class HistoricSite(Base):
             'id': self.id,
             'kind': 'historic',
             'name': self.name,
-            'latitude': self.location.latitude,
-            'longitude': self.location.longitude,
+            'latitude': self.landmark.latitude,
+            'longitude': self.landmark.longitude,
         }
 
 
@@ -97,6 +97,6 @@ class UrbanSite(Base):
             'kind': 'urban',
             'name': self.name,
             'direction': self.direction,
-            'latitude': self.location.latitude,
-            'longitude': self.location.longitude,
+            'latitude': self.landmark.latitude,
+            'longitude': self.landmark.longitude,
         }
