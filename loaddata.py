@@ -84,7 +84,7 @@ class Poligon(object):
         y = 1/(6*self.area) * sum((self.points[i][1] + self.points[i+1][1]) *
                                   (self.points[i][0]*self.points[i+1][1] - self.points[i+1][0]*self.points[i][1])
                                   for i in range(self.length - 1))
-        return (x, y)
+        return (y, x)
 
     @reify
     def area(self):
