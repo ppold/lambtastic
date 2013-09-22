@@ -3,6 +3,7 @@
 
 from __future__ import print_function
 import csv
+import json
 import logging
 from os import path
 from collections import namedtuple
@@ -11,6 +12,7 @@ try:
 except ImportError:  # python2
     from urllib import urlretrieve
 
+from urllib3 import PoolManager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -21,6 +23,7 @@ from core.models import Landmark, Kind
 engine = create_engine(settings.SQLALCHEMY_DB_URI)
 Session = sessionmaker(bind=engine)
 session = Session()
+http = PoolManager()
 
 
 Dataset = namedtuple('Dataset', ['filename', 'url'])
@@ -32,7 +35,16 @@ def UnicodeDictReader(utf8_data, **kwargs):
         yield {key: unicode(value, 'utf-8') for key, value in row.iteritems()}
 
 
+def get_geolocation_data(address):
+    """Get gps information about a given address."""
+    url = 'http://maps.googleapis.com/maps/api/geocode/json'
+    fields = {'address': address.encode('utf-8'), 'sensor': 'false', 'region': 'pe'}
+    resp = http.request('GET', url, fields=fields)
+    return json.loads(resp.data)
+
+
 def download_data(url, filename=None):
+    logging.info('Downloading ... %s', url)
     if filename is None:
         filename = path.basename(url)
     if not path.exists(filename):
@@ -41,10 +53,9 @@ def download_data(url, filename=None):
 
 def load_museos():
     dataset = Dataset('museos.csv', 'http://lima.datosabiertos.pe/datastreams/79487-museos-de-lima.csv')
-    logging.info('Downloading ...', dataset.url)
     download_data(dataset.url, dataset.filename)
-    logging.info('loading ...', dataset.url)
-    museo = Kind(name='museo')
+    museo = Kind(name=u'museo')
+    logging.info('Loading ... %s', dataset.url)
     with open(dataset.filename) as csvfile:
         for row in UnicodeDictReader(csvfile):
             landmark = Landmark(
@@ -60,9 +71,8 @@ def load_museos():
 def load_arqueologicos():
     """Load sitios arqueologicos"""
     dataset = Dataset('sitios.csv', 'http://lima.datosabiertos.pe/datastreams/79519-sitios-arqueologicos-de-lima.csv')
-    logging.info('Downloading ...', dataset.url)
     download_data(dataset.url, dataset.filename)
-    logging.info('loading ...', dataset.filename)
+    logging.info('loading ... %s', dataset.filename)
     with open(dataset.filename) as csvfile:
         for row in UnicodeDictReader(csvfile):
             landmark = Landmark(
@@ -75,49 +85,42 @@ def load_arqueologicos():
 
 
 def load_historicos():
-    dataset = Dataset('historicos.csv', 'http://lima.datosabiertos.pe/datastreams/79490-ambientes-urbano-monumentales-en-el-centro-historico-de-lima.csv'),
-    logging.info('Downloading ...', dataset.url)
+    dataset = Dataset('historicos.csv', 'http://lima.datosabiertos.pe/datastreams/79490-ambientes-urbano-monumentales-en-el-centro-historico-de-lima.csv')
     download_data(dataset.url, dataset.filename)
-    logging.info('loading ...', dataset.filename)
+    historico = Kind(name=u'Centro Historico')
+    logging.info('Loading ...  %s', dataset.filename)
     with open(dataset.filename) as csvfile:
         for row in UnicodeDictReader(csvfile):
-            landmark = Landmark(
-                name=row['NOMBRE_DEL_MUSEO'],
-                latitude=row['LATITUD'],
-                longitude=row['LONGITUD'],
-            )
+            location = u'{0} {1}, Lima, Peru'.format(row['Dirección'], row[''])  # LOL
+            geo = get_geolocation_data(location)
+            logging.debug('Received geolocation: %s', geo)
+            if not geo['results']:
+                landmark = Landmark(
+                    kind=historico,
+                    name=row['Ubicación'],
+                    latitude=None,
+                    longitude=None,
+                )
+            else:
+                landmark = Landmark(
+                    kind=historico,
+                    name=row['Ubicación'],
+                    latitude=geo['results'][0]['geometry']['location']['lat'],
+                    longitude=geo['results'][0]['geometry']['location']['lng'],
+                )
             session.add(landmark)
         session.commit()
 
 
 if __name__ == '__main__':
+    from argparse import ArgumentParser
+    parser = ArgumentParser(description='Panavision sync')
+    parser.add_argument('-l', '--loglevel', dest='loglevel', default='info',
+                        type=str, help='Logging level')
+    args = parser.parse_args()
+    level = getattr(logging, args.loglevel.upper(), logging.INFO)
+    logging.basicConfig(level=level)
+
     load_museos()
     #load_arqueologicos()
-    #load_historicos()
-
-# def get_geolocation_data(address):
-#     """ gets gps information about a given address """
-
-#     google_geocode_api = 'http://maps.googleapis.com/maps/api/geocode/json'
-#     payload = {'address': address, 'sensor': 'false', 'region': 'pe'}
-#     request = requests.get(google_geocode_api, params=payload)
-
-#     json_data = json.loads(request.text)
-#     status = json_data['status']
-
-#     if status == 'ZERO_RESULTS':
-#         print 'No results.'
-#     elif status == 'OVER_QUERY_LIMIT':
-#         print 'Limit reached, try again later.'
-#     else:
-#         geometry = json_data['results'][0]['geometry']
-#         location = geometry['location']
-#         bounds = geometry['viewport']
-#         northeast = bounds['northeast']
-#         southwest = bounds['southwest']
-
-#         return dict(
-#             latitude=location['lat'], longitude=location['lng'],
-#             north=northeast['lat'], east=northeast['lng'],
-#             south=southwest['lat'], west=southwest['lng']
-#         )
+    load_historicos()
