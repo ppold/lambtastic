@@ -29,10 +29,68 @@ http = PoolManager()
 Dataset = namedtuple('Dataset', ['filename', 'url'])
 
 
+def unicode_csv_reader(utf8_data, **kwargs):
+    csv_reader = csv.reader(utf8_data, **kwargs)
+    for row in csv_reader:
+        yield [unicode(cell, 'utf-8') for cell in row]
+
+
 def UnicodeDictReader(utf8_data, **kwargs):
     csv_reader = csv.DictReader(utf8_data, **kwargs)
     for row in csv_reader:
         yield {key: unicode(value, 'utf-8') for key, value in row.iteritems()}
+
+
+def convfloat(string):
+    """
+    >>> convfloat(' -76.85446015010548,-12.22286259231198,')
+    [-76.85446015010548, -12.22286259231198]
+    """
+    values = string.split(',')
+    return [float(value) for value in values if value]
+
+
+class reify(object):
+    def __init__(self, wrapped):
+        self.wrapped = wrapped
+        try:
+            self.__doc__ = wrapped.__doc__
+        except:  # pragma: no cover
+            pass
+
+    def __get__(self, inst, objtype=None):
+        if inst is None:
+            return self
+        val = self.wrapped(inst)
+        setattr(inst, self.wrapped.__name__, val)
+        return val
+
+
+class Poligon(object):
+    # http://en.wikipedia.org/wiki/Centroid#Centroid_of_polygon
+    def __init__(self, points):
+        self.points = points
+
+    @property
+    def length(self):
+        return len(self.points)
+
+    @reify
+    def centroid(self):
+        x = 1/(6*self.area) * sum((self.points[i][0] + self.points[i+1][0]) *
+                                  (self.points[i][0]*self.points[i+1][1] - self.points[i+1][0]*self.points[i][1])
+                                  for i in range(self.length - 1))
+
+        y = 1/(6*self.area) * sum((self.points[i][1] + self.points[i+1][1]) *
+                                  (self.points[i][0]*self.points[i+1][1] - self.points[i+1][0]*self.points[i][1])
+                                  for i in range(self.length - 1))
+        return (x, y)
+
+    @reify
+    def area(self):
+        return 0.5 * sum(self.points[i][0]*self.points[i+1][1] -
+                         self.points[i+1][0]*self.points[i][1]
+                         for i in range(self.length - 1))
 
 
 def get_geolocation_data(address):
@@ -73,13 +131,18 @@ def load_sitios():
     dataset = Dataset('sitios.csv', 'http://lima.datosabiertos.pe/datastreams/79519-sitios-arqueologicos-de-lima.csv')
     download_data(dataset.url, dataset.filename)
     logging.info('loading ... %s', dataset.filename)
-    return
+    sitio = Kind(name=u'sitio')
     with open(dataset.filename) as csvfile:
-        for row in UnicodeDictReader(csvfile):
+        for row in unicode_csv_reader(csvfile):
+            name = row[0]
+            points = [convfloat(i) for i in row[2].split('0.0') if i.strip()]  # muahahaha
+            poligon = Poligon(points)
+            centroid = poligon.centroid
             landmark = Landmark(
-                name=row['NOMBRE_DEL_MUSEO'],
-                latitude=row['LATITUD'],
-                longitude=row['LONGITUD'],
+                name=name,
+                kind=sitio,
+                latitude=centroid[0],
+                longitude=centroid[1],
             )
             session.add(landmark)
         session.commit()
@@ -121,6 +184,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--museos', dest='museos', action='store_true', help='Load only museos')
     parser.add_argument('-s', '--sitios', dest='sitios', action='store_true', help='Load only sitios arqueologicos')
     parser.add_argument('-u', '--urbanos', dest='urbanos', action='store_true', help='Load only sitios urbanos')
+    parser.add_argument('-t', '--test', dest='test', action='store_true', help='testing Bro')
     args = parser.parse_args()
     level = getattr(logging, args.loglevel.upper(), logging.INFO)
     logging.basicConfig(level=level)
@@ -139,3 +203,7 @@ if __name__ == '__main__':
 
     if args.urbanos:
         load_urbanos()
+
+    if args.test:
+        import doctest
+        doctest.testmod()
