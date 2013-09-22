@@ -21,9 +21,19 @@
 	<li id={{ id }}>
 		<a href="#{{ id }}">
 			<h1>{{ name }}</h1>
-			<h2>Av Cuba 127 Jesus Maria, Lima, Lima</h2>
 			<div class="details">
-				<p>more details</p>
+				{{#ifCond kind "museo"}}
+				<p class="description">{{ description }}</p>
+				<p class="schedule">Horario: {{ schedule }}</p>
+				<p class="cost">Costo: {{ cost }}</p>
+				<p class="webpage">Sitio web: {{ webpage }}</p>
+				{{/ifCond}}
+				{{#ifCond kind "urban"}}
+				<p class="description">{{ arch_type }}. {{ description }}</p>
+				<p class="address"><span class="address-prefix">Dirección:</span> {{ direction }}</p>
+				{{/ifCond}}
+				<p class="distance">Distancia: <span class="distance-value"></span></p>
+				<p class="time">Tiempo en llegar: <span class="time-value"></span></p>
 			</div>
 		</a>
 	</li>

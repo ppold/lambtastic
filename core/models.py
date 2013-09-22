@@ -48,16 +48,16 @@ class Museum(Base):
 
     def _asdict(self):
         return {
-            'id': self.id,
+            'id': self.landmark.id,
             'kind': 'museo',
             'name': self.name,
             'cost': self.cost,
             'phone': self.phone,
             'schedule': self.schedule,
             'description': self.description,
+            'webpage': self.webpage,
             'latitude': self.landmark.latitude,
             'longitude': self.landmark.longitude,
-            'description': self.description,
         }
 
 
@@ -72,7 +72,7 @@ class HistoricSite(Base):
 
     def _asdict(self):
         return {
-            'id': self.id,
+            'id': self.landmark.id,
             'kind': 'historic',
             'name': self.name,
             'latitude': self.landmark.latitude,
@@ -94,10 +94,12 @@ class UrbanSite(Base):
 
     def _asdict(self):
         return {
-            'id': self.id,
+            'id': self.landmark.id,
             'kind': 'urban',
             'name': self.name,
             'direction': self.direction,
+            'arch_type': self.arch_type,
+            'description': self.description,
             'latitude': self.landmark.latitude,
             'longitude': self.landmark.longitude,
         }

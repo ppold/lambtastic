@@ -1,4 +1,11 @@
 require(['./xhr', './promise'], function(xhr, Promise) {
+	Handlebars.registerHelper('ifCond', function(v1, v2, options) {
+	  if(v1 === v2) {
+	    return options.fn(this);
+	  }
+	  return options.inverse(this);
+	});
+
 	var initialize = function initialize(latitude, longitude) {
 		var mapOptions = {
 			center: new google.maps.LatLng(latitude, longitude),
@@ -15,7 +22,7 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 				position: myLatlng,
 				title: 'Posición actual',
 				map: map,
-				icon: '/static/img/current.png'
+				icon: '/static/img/triangle-24.png'
 		});
 
 		var markers = [];
@@ -51,12 +58,14 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 				landmarks = landmarks.concat(JSON.parse(data[0]));
 			});
 
+			console.log(landmarks);
+
 			landmarks.forEach(add_landmark);
 			template = Handlebars.compile(document.querySelector('#results_template').innerHTML);
 			results = document.querySelector('#results');
 			results.innerHTML = template({landmarks:landmarks});
 
-			function show_route (from, to) {
+			function show_route (from, to, el) {
 				var request = {
 					origin:from.position,
 					destination:to.position,
@@ -64,8 +73,12 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 				};
 				directionsService.route(request, function(result, status) {
 					if (status == google.maps.DirectionsStatus.OK) {
-						console.log(result);
+						// console.log(result);
+						var info = result.routes[0].legs[0];
+						console.log(el, el.querySelector('.distance-value'));
 						directionsDisplay.setDirections(result);
+						el.querySelector('.distance-value').textContent = info.distance.text;
+						el.querySelector('.time-value').textContent = info.duration.text;
 					}
 				});
 			}
@@ -73,10 +86,10 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 
 			var wholeListing = document.querySelector("#results");
 
-			Array.prototype.forEach.call(document.querySelectorAll("li", wholeListing), function (elem) {
+			Array.prototype.forEach.call(wholeListing.querySelectorAll("li"), function (elem) {
 				elem.addEventListener('click', function (event) {
 					var index = Array.prototype.indexOf.call(wholeListing.children, event.currentTarget);
-					show_route(from, markers[index]);
+					show_route(from, markers[index], event.currentTarget);
 				});
 			});
 		});

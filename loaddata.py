@@ -141,6 +141,7 @@ def load_museos():
                            phone=row['TELEFONO'],
                            webpage=row['PAGINA_WEB'],
                            schedule=row['HORARIO_ATENCION'],
+                           description=row['DIRECCION'],
                            landmark=landmark)
             session.add(museo)
         session.commit()
