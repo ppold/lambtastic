@@ -12,10 +12,22 @@ html, body {
     clear: both;
 }
 
-.map {
+.map-canvas {
 	width: 100%;
 	height: 100%;
-	float: right;
+}
+
+.container {
+	height: 100%;
+}
+
+.map {
+	/*position: absolute;*/
+	/*width: calc(100% - 288px);*/
+	width: 100%;
+	height: 100%;
+	/*float: right;*/
+	/*right: 0;*/
 }
 
 .landmarks {
@@ -24,7 +36,13 @@ html, body {
 	color: white;
 	padding: 10px 20px;
 	width: 288px;
+	/*position: absolute;*/
 	float: left;
+	top: 0;
+	bottom: 0;
+	height: 100%;
+	overflow: scroll;
+	display: inline-block;
 }
 
 .landmarks-list {
