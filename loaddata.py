@@ -64,6 +64,14 @@ def clean_sitename(name):
     return re.sub(useless_number, '', name)
 
 
+def clean_direction(name):
+    """
+    >>> clean_direction('Callao Nº 901, 909, esq. Jr. Tayacaja Nº 300, 308, 310, 312, 314, 318, 320, 324, 326, 328, 332, 336, 340')
+    'Callao Nº 901, esq. Jr. Tayacaja Nº 300, 340'
+    """
+    return re.sub(re.compile('(\d+, )(\d+, )+'), '\g<1>', name)
+
+
 class reify(object):
     def __init__(self, wrapped):
         self.wrapped = wrapped
@@ -199,7 +207,7 @@ def load_urbanos():
             urban_site = UrbanSite(
                 name=name,
                 landmark=landmark,
-                direction=u'{0} {1}'.format(row['Dirección'], row['']),
+                direction=clean_direction(u'{0} {1}'.format(row['Dirección'], row[''])),
                 description=row['Descripción'],
                 arch_type=row['Tipo de arquitectura']
             )
