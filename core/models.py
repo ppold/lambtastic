@@ -29,6 +29,7 @@ class Landmark(BASE, PKMixin, EnumMixin):
     """ a point of interest """
 
     __tablename__ = "landmark"
+    kind_id = Column(Integer, ForeignKey('kind.key'))
 
     latitude = Column(String)
     longitude = Column(String)

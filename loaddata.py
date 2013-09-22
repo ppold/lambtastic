@@ -42,7 +42,7 @@ def download_data(url, filename=None):
 def load_museos():
     dataset = Dataset('museos.csv', 'http://lima.datosabiertos.pe/datastreams/79487-museos-de-lima.csv')
     logging.info('Downloading ...', dataset.url)
-    download_data(dataset.url)
+    download_data(dataset.url, dataset.filename)
     logging.info('loading ...', dataset.url)
     with open(dataset.filename) as csvfile:
         for row in UnicodeDictReader(csvfile):
