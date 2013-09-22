@@ -129,14 +129,14 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 	}
 
 	var get_location = function get_location() {
-		navigator.geolocation.getCurrentPosition(response, function errorHandler (error) {
-			console.log('error', error);
-		});
+		// navigator.geolocation.getCurrentPosition(response, function errorHandler (error) {
+		// 	console.log('error', error);
+		// });
 
-		// response({coords:{
-		// 	latitude: -12.0639788,
-		// 	longitude: -77.03694980000002
-		// }});
+		response({coords:{
+			latitude: -12.0639788,
+			longitude: -77.03694980000002
+		}});
 	}
 
 	get_location();
