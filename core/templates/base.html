@@ -11,10 +11,22 @@
 	<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.3.0/pure-min.css">
 	<link rel="stylesheet" href="/static/styles/app.css">
 	<link rel='icon' type='image/png' href='/static/images/favicon.png'>
+	<link href='http://fonts.googleapis.com/css?family=Roboto:400,300italic,300,100italic,100,400italic' rel='stylesheet' type='text/css'>
 </head>
 <body class='{% block body_class %}{% endblock %}'>
 	{% block content %}{% endblock %}
+	{% raw %}
+	<script id="results_template" type="text/x-handlebars-template">
+	{{#each landmarks}}
+	<li>
+		<h1>{{ name }}</h1>
+		<h2>Av Cuba 127 Jesus Maria, Lima, Lima</h2>
+	</li>
+	{{/each}}
+	</script>
+	{% endraw %}
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
+	<script src="/static/scripts/handlebars.js"></script>
 	<script src="http://requirejs.org/docs/release/2.1.8/minified/require.js" data-main="/static/scripts/app"></script>
 </body>
 </html>

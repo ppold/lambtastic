@@ -2,7 +2,52 @@ html, body {
 	height: 100%;
 }
 
-.map-canvas {
+.cf:before,
+.cf:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.cf:after {
+    clear: both;
+}
+
+.map {
 	width: 100%;
 	height: 100%;
+	float: right;
+}
+
+.landmarks {
+	font-family: 'Helvetica Neue', sans-serif;
+	background: black;
+	color: white;
+	padding: 10px 20px;
+	width: 288px;
+	float: left;
+}
+
+.landmarks-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.landmarks h1, h2 {
+	margin: 0;
+	margin-bottom: 0.2em;
+	font-weight: 100;
+}
+
+.landmarks li {
+	padding: 10px 0;
+}
+
+.landmarks h1 {
+	font-size: 22px;
+}
+
+.landmarks h2 {
+	font-size: 12px;
+	color: red;
 }

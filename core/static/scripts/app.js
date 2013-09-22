@@ -8,16 +8,19 @@ require(['./xhr'], function(xhr) {
 		var map = new google.maps.Map(document.querySelector(".map-canvas"), mapOptions);
 
 		xhr.get("/landmarks/museums").then(function result (data) {
-			JSON.parse(data).forEach(function add_landmark (landmark) {
-				var myLatlng = new google.maps.LatLng(landmark.latitude, landmark.longitude);
+			jsonResult = JSON.parse(data);
+			jsonResult.forEach(function add_landmark (landmark) {
+				// var myLatlng = new google.maps.LatLng(landmark.latitude, landmark.longitude);
+				// var marker = new google.maps.Marker({
+				//     position: myLatlng,
+				//     title: landmark.name,
+				//     map: map
+				// });
 				console.log(landmark);
-				var marker = new google.maps.Marker({
-				    position: myLatlng,
-				    title: landmark.name
-				});
-
-				marker.setMap(map);
 			});
+			template = Handlebars.compile(document.querySelector('#results_template').innerHTML);
+			results = document.querySelector('#results');
+			results.innerHTML = template({landmarks:jsonResult});
 		});
 	}
 
