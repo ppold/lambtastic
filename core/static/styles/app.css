@@ -42,9 +42,9 @@ text-decoration: none;
 .map {
 	/*position: absolute;*/
 	/*width: calc(100% - 288px);*/
-	width: 70%;
+	/*width: 70%;*/
 	height: 100%;
-	float: right;
+	float: left;
 	/*float: right;*/
 	/*right: 0;*/
 }
@@ -54,10 +54,11 @@ text-decoration: none;
 	background: black;
 	color: white;
 	/*width: 288px;*/
-	width: 350px;
+	/*width: 350px;*/
 	height: 100%;
 	overflow: scroll;
 	float: left;
+	width: calc(25% - 1px);
 }
 
 .landmarks-list {

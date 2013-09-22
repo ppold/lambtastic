@@ -13,7 +13,7 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 		var myLatlng = new google.maps.LatLng(latitude, longitude);
 		var from = new google.maps.Marker({
 				position: myLatlng,
-				title: 'aqui estamos',
+				title: 'Posición actual',
 				map: map,
 				icon: '/static/img/current.png'
 		});
@@ -21,11 +21,22 @@ require(['./xhr', './promise'], function(xhr, Promise) {
 		var markers = [];
 
 		function add_landmark (landmark) {
+			var icon = null;
+
+			if (landmark.kind == 'urban') {
+				icon = '/static/img/town-hall-24.png';
+			} else if (landmark.kind == 'historic') {
+				icon = '/static/img/monument-24.png';
+			} else if (landmark.kind == 'museo') {
+				icon = '/static/img/museum-24.png';
+			}
+
 			var myLatlng = new google.maps.LatLng(landmark.latitude, landmark.longitude);
 			var marker = new google.maps.Marker({
 					position: myLatlng,
 					title: landmark.name,
-					map: map
+					map: map,
+					icon: icon
 			});
 
 			markers.push(marker);
