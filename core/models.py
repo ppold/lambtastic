@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import uuid
+
 from sqlalchemy import Column, Integer, Unicode, String
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import ForeignKey
@@ -12,12 +14,19 @@ class Landmark(Base):
     __tablename__ = 'landmark'
 
     id = Column(Integer, primary_key=True)
+    guid = Column(String, nullable=False)
     latitude = Column(String)
     longitude = Column(String)
+
+    def __init__(self, **kwargs):
+        guid = uuid.uuid4()
+        kwargs.setdefault('guid', guid)
+        super(Landmark, self).__init__(**kwargs)
 
     def _asdict(self):
         return {
             'id': self.key,
+            'guid': self.guid,
             'latitude': self.latitude,
             'longitude': self.longitude,
         }
