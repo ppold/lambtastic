@@ -44,7 +44,7 @@ def send_static(filepath):
 
 
 @get("/landmarks/<key:int>")
-def landmark(session):
+def landmark(session, key):
     """ returns information about a landmark in particular """
 
     response.content_type = "application/json"
