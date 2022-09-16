@@ -1,4 +1,4 @@
-Mako==0.8.0
+Mako==1.2.2
 MarkupSafe==0.15
 SQLAlchemy==0.8.1
 alembic==0.6.0
